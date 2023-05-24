@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.special import comb
 import itertools
-n=7
+n=4
 def buildbin(n):
     if n==0:
         return np.zeros((0,1),dtype=np.uint8)
@@ -39,11 +39,16 @@ if __name__ == '__main__':
         s=local_id[i,:]
         res=list(set(range(n))-set(s))
         for j in range(bin_ind.shape[0]):
-            for k in s:
-                split_list=[k]+[res[i] for i in range(n-4) if bin_ind[j,i]==1]
+            for k in range(4):
+                split_list=[s[k]]+[res[i] for i in range(n-4) if bin_ind[j,i]==1]
                 #print(split_list)
+                split_ind=np.sum(2**np.array(split_list))
                 if n-1 in split_list:
-                    
+                    split_ind=2**n-1-split_ind
+                split_ind-=1
+                split_ind+=local_offset
+                constraint_id+=1
+                f.write(f' c{constraint_id}: x{split_ind}<=x{4*i+k}\n')
     f.write('Bounds\nBinary\n')
     f.write(' '.join(var_name_arr)+'\n')
     f.write('End\n')
